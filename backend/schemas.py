@@ -30,6 +30,8 @@ class UserResponse(BaseModel):
     website: Optional[str]
     linkedin: Optional[str]
     onboarding_completed: bool
+    github_username: Optional[str] = None
+    github_avatar_url: Optional[str] = None
 
     class Config:
         from_attributes = True

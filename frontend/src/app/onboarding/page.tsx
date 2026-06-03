@@ -38,6 +38,15 @@ export default function OnboardingPage() {
 
   // Show welcome splash for ~1.6s on mount
   useEffect(() => {
+    // GitHub OAuth signup returns here with #token=...
+    if (typeof window !== "undefined" && window.location.hash.includes("token=")) {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const t = params.get("token");
+      if (t) {
+        localStorage.setItem("token", t);
+        history.replaceState(null, "", window.location.pathname);
+      }
+    }
     const t = setTimeout(() => setWelcome(false), 1700);
     return () => clearTimeout(t);
   }, []);

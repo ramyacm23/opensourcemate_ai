@@ -3,7 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff } from "react-icons/fi";
+import { FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff, FiGithub } from "react-icons/fi";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -78,6 +78,20 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            <Button
+              type="button"
+              onClick={() => { window.location.href = api.githubSignupUrl(); }}
+              className="w-full h-11 bg-white text-slate-900 hover:bg-slate-100 font-medium transition-all flex items-center justify-center gap-2"
+            >
+              <FiGithub size={16} /> Continue with GitHub
+            </Button>
+
+            <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="flex-1 h-px bg-border" />
+              or with email
+              <span className="flex-1 h-px bg-border" />
+            </div>
+
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-sm text-muted-foreground">Email</Label>
               <div className="relative">

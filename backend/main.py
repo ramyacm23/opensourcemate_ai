@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine
-from routes import auth_routes, onboarding_routes, dashboard_routes
+from routes import auth_routes, onboarding_routes, dashboard_routes, github_routes
 
 Base.metadata.create_all(bind=engine)
 
@@ -22,6 +22,7 @@ app.add_middleware(
 app.include_router(auth_routes.router)
 app.include_router(onboarding_routes.router)
 app.include_router(dashboard_routes.router)
+app.include_router(github_routes.router)
 
 @app.get("/")
 def root():
