@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   FiUser, FiMail, FiPhone, FiGlobe, FiLinkedin, FiGithub,
   FiMapPin, FiEdit2, FiCheck, FiX, FiUpload, FiTrash2,
-  FiArrowLeft, FiCamera, FiLoader,
+  FiCamera, FiLoader,
 } from "react-icons/fi";
 import { api, resolveAvatar } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
@@ -161,24 +161,8 @@ export default function ProfilePage() {
   const avatarSrc = resolveAvatar(user.avatar_url) || user.github_avatar_url || null;
 
   return (
-    <div className="min-h-screen bg-background text-white relative overflow-hidden">
-      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-      <div className="absolute inset-0 radial-fade pointer-events-none" />
+    <div className="max-w-5xl mx-auto px-3 md:px-6">
 
-      <nav className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
-        <div className="max-w-5xl mx-auto px-6 pl-20 md:pl-24 py-3.5 flex items-center justify-between">
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-crimson transition-colors"
-          >
-            <FiArrowLeft size={14} /> Back to dashboard
-          </button>
-          <h1 className="text-sm font-semibold tracking-tight">Profile</h1>
-          <div className="w-[140px]" />
-        </div>
-      </nav>
-
-      <main className="relative z-10 max-w-5xl mx-auto px-6 pl-20 md:pl-24 pb-24 md:pb-12 py-8 md:py-12">
         {(error || success) && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
@@ -418,7 +402,6 @@ export default function ProfilePage() {
             </div>
           </div>
         </motion.section>
-      </main>
     </div>
   );
 }

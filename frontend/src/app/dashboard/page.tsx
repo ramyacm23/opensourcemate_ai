@@ -3,15 +3,15 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-  FiCode, FiZap, FiLogOut, FiUser, FiGlobe, FiLinkedin,
-  FiSearch, FiTrendingUp, FiGitPullRequest, FiActivity,
-  FiArrowRight, FiBell, FiCpu, FiTerminal, FiCheckCircle,
+  FiCode, FiZap, FiUser, FiGlobe, FiLinkedin,
+  FiTrendingUp, FiGitPullRequest, FiActivity,
+  FiArrowRight, FiCpu, FiTerminal, FiCheckCircle,
   FiInbox, FiShield, FiPhone, FiMail, FiAward, FiPlus,
   FiGithub, FiStar, FiGitBranch, FiAlertCircle, FiRefreshCw, FiLink,
 } from "react-icons/fi";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { api, resolveAvatar } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface User {
   id: number; email: string; name: string; mobile: string;
@@ -37,7 +37,6 @@ const typeColor: Record<string, string> = {
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [query, setQuery] = useState("");
   const [repos, setRepos] = useState<GHRepo[] | null>(null);
   const [reposError, setReposError] = useState<string | null>(null);
   const [reposLoading, setReposLoading] = useState(false);
@@ -89,11 +88,6 @@ export default function DashboardPage() {
     } catch {}
   }
 
-  function logout() {
-    localStorage.removeItem("token");
-    router.push("/");
-  }
-
   const greeting = useMemo(() => {
     const h = new Date().getHours();
     if (h < 12) return "Good morning";
@@ -135,69 +129,8 @@ export default function DashboardPage() {
   ].filter(Boolean) as { icon: React.ReactNode; color: string; text: string }[];
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <div className="fixed inset-0 grid-bg opacity-60 pointer-events-none" />
-      <div className="fixed top-[-200px] left-1/2 -translate-x-1/2 w-[1100px] h-[500px] bg-crimson/8 rounded-full blur-[120px] pointer-events-none" />
-
-      <nav className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 pl-20 md:pl-24 py-3.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <span className="w-7 h-7 rounded-md bg-crimson/15 border border-crimson/30 flex items-center justify-center text-crimson">
-              <FiCode size={14} />
-            </span>
-            <span className="text-white text-[15px] font-semibold tracking-tight hidden sm:inline">
-              OpenSource<span className="text-crimson">Mate</span>
-            </span>
-          </div>
-
-          <div className="relative flex-1 max-w-lg">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
-            <input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search your workspace…"
-              className="w-full bg-surface border border-border rounded-lg pl-9 pr-3 h-9 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-crimson/50 focus:ring-2 focus:ring-crimson/15 transition-all"
-            />
-            <kbd className="hidden md:inline absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground bg-background border border-border rounded px-1.5 py-0.5">⌘K</kbd>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button className="w-9 h-9 rounded-lg border border-border bg-surface text-muted-foreground hover:text-white hover:border-crimson/40 transition-all flex items-center justify-center relative">
-              <FiBell size={15} />
-            </button>
-            <div className="hidden sm:flex items-center gap-2 pl-2 ml-1 border-l border-border">
-              <button
-                onClick={() => router.push("/profile")}
-                title="View profile"
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-              >
-                {(() => {
-                  const src = resolveAvatar(user.avatar_url) || user.github_avatar_url;
-                  return src ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={src} alt={user.name || user.email}
-                      className="w-8 h-8 rounded-full object-cover border border-crimson/30" />
-                  ) : (
-                    <span className="w-8 h-8 rounded-full bg-crimson/15 border border-crimson/30 text-crimson flex items-center justify-center text-sm font-semibold">
-                      {initial}
-                    </span>
-                  );
-                })()}
-                <div className="leading-tight text-left">
-                  <p className="text-xs font-medium text-white max-w-[140px] truncate">{user.name || "Contributor"}</p>
-                  <p className="text-[10.5px] text-muted-foreground max-w-[140px] truncate">{user.email}</p>
-                </div>
-              </button>
-            </div>
-            <button onClick={logout} title="Sign out" className="w-9 h-9 rounded-lg border border-border bg-surface text-muted-foreground hover:text-red-400 hover:border-red-400/40 transition-all flex items-center justify-center">
-              <FiLogOut size={15} />
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <main className="relative z-10 max-w-7xl mx-auto px-6 pl-20 md:pl-24 pb-24 md:pb-10 py-8 md:py-10">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+    <div className="max-w-7xl mx-auto px-3 md:px-6">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
           className="flex items-start justify-between gap-4 mb-8 flex-wrap">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-crimson font-mono mb-2">{greeting}</p>
@@ -341,10 +274,6 @@ export default function DashboardPage() {
             ) : (
               <ul className="divide-y divide-border">
                 {(repos || [])
-                  .filter(r => !query.trim() ||
-                    r.full_name.toLowerCase().includes(query.toLowerCase()) ||
-                    (r.description || "").toLowerCase().includes(query.toLowerCase()) ||
-                    (r.language || "").toLowerCase().includes(query.toLowerCase()))
                   .map((r, i) => (
                     <motion.li
                       key={r.id}
@@ -522,7 +451,6 @@ export default function DashboardPage() {
             </motion.section>
           </div>
         </div>
-      </main>
     </div>
   );
 }

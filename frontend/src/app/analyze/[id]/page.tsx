@@ -96,23 +96,16 @@ export default function AnalysisResultPage({ params }: { params: Promise<{ id: s
   const cmds = (data.git_commands || "").split("\n").filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-background text-white relative overflow-hidden">
-      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-      <div className="absolute inset-0 radial-fade pointer-events-none" />
+    <div className="max-w-5xl mx-auto px-3 md:px-6 space-y-5">
+      <div className="flex items-center justify-between mb-2">
+        <button onClick={() => router.push("/analyze")} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-crimson transition-colors">
+          <FiArrowLeft size={14} /> New analysis
+        </button>
+        <button onClick={handleDelete} className="text-xs text-muted-foreground hover:text-red-400 transition-colors inline-flex items-center gap-1">
+          <FiTrash2 size={11} /> Delete
+        </button>
+      </div>
 
-      <nav className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
-        <div className="max-w-5xl mx-auto px-6 py-3.5 pl-20 md:pl-24 flex items-center justify-between">
-          <button onClick={() => router.push("/analyze")} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-crimson transition-colors">
-            <FiArrowLeft size={14} /> New analysis
-          </button>
-          <h1 className="text-sm font-semibold tracking-tight">Analysis #{data.id}</h1>
-          <button onClick={handleDelete} className="text-xs text-muted-foreground hover:text-red-400 transition-colors inline-flex items-center gap-1">
-            <FiTrash2 size={11} /> Delete
-          </button>
-        </div>
-      </nav>
-
-      <main className="relative z-10 max-w-5xl mx-auto px-6 pl-20 md:pl-24 py-8 md:py-10 space-y-5">
         {data.status === "error" && (
           <div className="px-4 py-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-300 text-sm flex items-center gap-2">
             <FiAlertCircle size={14} /> {data.error_message || "Analysis failed"}
@@ -317,7 +310,6 @@ export default function AnalysisResultPage({ params }: { params: Promise<{ id: s
             </div>
           </motion.section>
         )}
-      </main>
     </div>
   );
 }

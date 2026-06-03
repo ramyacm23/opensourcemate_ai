@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FiArrowLeft, FiLoader, FiZap, FiInbox, FiClock } from "react-icons/fi";
+import { FiLoader, FiZap, FiInbox, FiClock } from "react-icons/fi";
 import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 
@@ -33,23 +33,13 @@ export default function HistoryPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-background text-white relative overflow-hidden">
-      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-      <div className="absolute inset-0 radial-fade pointer-events-none" />
+    <div className="max-w-4xl mx-auto px-3 md:px-6">
+      <div className="flex items-center justify-end mb-3">
+        <button onClick={() => router.push("/analyze")} className="text-xs text-crimson hover:text-crimson-dark inline-flex items-center gap-1">
+          <FiZap size={11} /> New
+        </button>
+      </div>
 
-      <nav className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-3.5 pl-20 md:pl-24 flex items-center justify-between">
-          <button onClick={() => router.push("/dashboard")} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-crimson transition-colors">
-            <FiArrowLeft size={14} /> Back
-          </button>
-          <h1 className="text-sm font-semibold tracking-tight">Analysis history</h1>
-          <button onClick={() => router.push("/analyze")} className="text-xs text-crimson hover:text-crimson-dark inline-flex items-center gap-1">
-            <FiZap size={11} /> New
-          </button>
-        </div>
-      </nav>
-
-      <main className="relative z-10 max-w-4xl mx-auto px-6 pl-20 md:pl-24 py-10">
         {items === null ? (
           <div className="text-center py-20">
             <FiLoader className="animate-spin text-crimson mx-auto" size={24} />
@@ -105,7 +95,6 @@ export default function HistoryPage() {
             ))}
           </ul>
         )}
-      </main>
     </div>
   );
 }
