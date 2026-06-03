@@ -131,7 +131,7 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-3 md:px-6">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-          className="flex items-start justify-between gap-4 mt-6 md:mt-8 mb-8 flex-wrap">
+          className="flex items-start justify-between gap-4 mt-12 md:mt-16 mb-8 flex-wrap">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-crimson font-mono mb-2">{greeting}</p>
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
