@@ -140,7 +140,7 @@ export default function DashboardPage() {
       <div className="fixed top-[-200px] left-1/2 -translate-x-1/2 w-[1100px] h-[500px] bg-crimson/8 rounded-full blur-[120px] pointer-events-none" />
 
       <nav className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-6 pl-20 md:pl-24 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <span className="w-7 h-7 rounded-md bg-crimson/15 border border-crimson/30 flex items-center justify-center text-crimson">
               <FiCode size={14} />
@@ -196,7 +196,7 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8 md:py-10">
+      <main className="relative z-10 max-w-7xl mx-auto px-6 pl-20 md:pl-24 pb-24 md:pb-10 py-8 md:py-10">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
           className="flex items-start justify-between gap-4 mb-8 flex-wrap">
           <div>

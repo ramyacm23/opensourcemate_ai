@@ -3,12 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  FiZap, FiAlertCircle, FiGitMerge,
+  FiArrowLeft, FiZap, FiAlertCircle, FiGitMerge,
   FiLink, FiPackage, FiLoader, FiCheck, FiGithub, FiSearch,
   FiLock, FiStar, FiChevronRight, FiX,
 } from "react-icons/fi";
 import { api } from "@/lib/api";
-import AppShell from "@/components/AppShell";
 
 type Repo = {
   id: number;
@@ -145,7 +144,29 @@ export default function AnalyzePage() {
   }
 
   return (
-    <AppShell width="narrow">
+    <div className="min-h-screen bg-background text-white relative overflow-hidden">
+      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
+      <div className="absolute inset-0 radial-fade pointer-events-none" />
+
+      <nav className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
+        <div className="max-w-4xl mx-auto px-6 py-3.5 pl-20 md:pl-24 flex items-center justify-between">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-crimson transition-colors"
+          >
+            <FiArrowLeft size={14} /> Back to dashboard
+          </button>
+          <h1 className="text-sm font-semibold tracking-tight">New analysis</h1>
+          <button
+            onClick={() => router.push("/analyze/history")}
+            className="text-xs text-muted-foreground hover:text-crimson transition-colors"
+          >
+            History
+          </button>
+        </div>
+      </nav>
+
+      <main className="relative z-10 max-w-4xl mx-auto px-6 pl-20 md:pl-24 py-10 md:py-14">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <p className="text-xs uppercase tracking-[0.2em] text-crimson font-mono mb-2">Stage 2 · Input</p>
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
@@ -419,7 +440,8 @@ export default function AnalyzePage() {
             )}
           </button>
         </motion.div>
-    </AppShell>
+      </main>
+    </div>
   );
 }
 

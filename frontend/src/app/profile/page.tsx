@@ -166,7 +166,7 @@ export default function ProfilePage() {
       <div className="absolute inset-0 radial-fade pointer-events-none" />
 
       <nav className="sticky top-0 z-30 backdrop-blur-md bg-background/70 border-b border-border">
-        <div className="max-w-5xl mx-auto px-6 py-3.5 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 pl-20 md:pl-24 py-3.5 flex items-center justify-between">
           <button
             onClick={() => router.push("/dashboard")}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-crimson transition-colors"
@@ -178,7 +178,7 @@ export default function ProfilePage() {
         </div>
       </nav>
 
-      <main className="relative z-10 max-w-5xl mx-auto px-6 py-8 md:py-12">
+      <main className="relative z-10 max-w-5xl mx-auto px-6 pl-20 md:pl-24 pb-24 md:pb-12 py-8 md:py-12">
         {(error || success) && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
