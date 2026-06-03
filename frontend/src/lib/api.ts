@@ -48,4 +48,48 @@ export const api = {
     if (!res.ok) throw new Error("Disconnect failed");
     return res.json();
   },
+
+  // Profile
+  getProfile: (token: string) => getJson("/profile/", token),
+  updateProfile: async (body: object, token: string) => {
+    const res = await fetch(`${API}/profile/`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Update failed");
+    return data;
+  },
+  uploadAvatar: async (file: File, token: string) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch(`${API}/profile/avatar`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Upload failed");
+    return data;
+  },
+  deleteAvatar: async (token: string) => {
+    const res = await fetch(`${API}/profile/avatar`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Delete failed");
+    return res.json();
+  },
 };
+
+// Helper to resolve avatar URLs returned by the API.
+// Backend returns /uploads/... — prefix with API host. External URLs (https://) pass through.
+export function resolveAvatar(url?: string | null): string | null {
+  if (!url) return null;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `${API}${url}`;
+}

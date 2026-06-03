@@ -11,11 +11,12 @@ import {
 } from "react-icons/fi";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { api } from "@/lib/api";
+import { api, resolveAvatar } from "@/lib/api";
 
 interface User {
   id: number; email: string; name: string; mobile: string;
   user_type: string; website: string; linkedin: string; onboarding_completed: boolean;
+  avatar_url?: string | null;
   github_username?: string | null;
   github_avatar_url?: string | null;
 }
@@ -165,13 +166,28 @@ export default function DashboardPage() {
               <FiBell size={15} />
             </button>
             <div className="hidden sm:flex items-center gap-2 pl-2 ml-1 border-l border-border">
-              <span className="w-8 h-8 rounded-full bg-crimson/15 border border-crimson/30 text-crimson flex items-center justify-center text-sm font-semibold">
-                {initial}
-              </span>
-              <div className="leading-tight">
-                <p className="text-xs font-medium text-white max-w-[140px] truncate">{user.name || "Contributor"}</p>
-                <p className="text-[10.5px] text-muted-foreground max-w-[140px] truncate">{user.email}</p>
-              </div>
+              <button
+                onClick={() => router.push("/profile")}
+                title="View profile"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
+                {(() => {
+                  const src = resolveAvatar(user.avatar_url) || user.github_avatar_url;
+                  return src ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={src} alt={user.name || user.email}
+                      className="w-8 h-8 rounded-full object-cover border border-crimson/30" />
+                  ) : (
+                    <span className="w-8 h-8 rounded-full bg-crimson/15 border border-crimson/30 text-crimson flex items-center justify-center text-sm font-semibold">
+                      {initial}
+                    </span>
+                  );
+                })()}
+                <div className="leading-tight text-left">
+                  <p className="text-xs font-medium text-white max-w-[140px] truncate">{user.name || "Contributor"}</p>
+                  <p className="text-[10.5px] text-muted-foreground max-w-[140px] truncate">{user.email}</p>
+                </div>
+              </button>
             </div>
             <button onClick={logout} title="Sign out" className="w-9 h-9 rounded-lg border border-border bg-surface text-muted-foreground hover:text-red-400 hover:border-red-400/40 transition-all flex items-center justify-center">
               <FiLogOut size={15} />
@@ -439,7 +455,10 @@ export default function DashboardPage() {
                 </button>
               )}
 
-              <button className="w-full mt-4 text-xs text-muted-foreground hover:text-crimson transition-colors inline-flex items-center justify-center gap-1.5 border border-border hover:border-crimson/40 rounded-md py-2">
+              <button
+                onClick={() => router.push("/profile")}
+                className="w-full mt-4 text-xs text-muted-foreground hover:text-crimson transition-colors inline-flex items-center justify-center gap-1.5 border border-border hover:border-crimson/40 rounded-md py-2"
+              >
                 <FiUser size={12} /> Edit profile
               </button>
             </motion.section>

@@ -23,6 +23,11 @@ class User(Base):
     linkedin = Column(String, nullable=True)
     onboarding_completed = Column(Boolean, default=False)
 
+    # profile fields
+    bio = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+    avatar_url = Column(String, nullable=True)
+
     # GitHub OAuth fields
     github_id = Column(Integer, unique=True, index=True, nullable=True)
     github_username = Column(String, nullable=True)

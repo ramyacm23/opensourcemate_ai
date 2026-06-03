@@ -13,8 +13,9 @@ if _env_file.exists():
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from database import Base, engine
-from routes import auth_routes, onboarding_routes, dashboard_routes, github_routes
+from routes import auth_routes, onboarding_routes, dashboard_routes, github_routes, profile_routes
 
 Base.metadata.create_all(bind=engine)
 
@@ -35,6 +36,13 @@ app.include_router(auth_routes.router)
 app.include_router(onboarding_routes.router)
 app.include_router(dashboard_routes.router)
 app.include_router(github_routes.router)
+app.include_router(profile_routes.router)
+
+# Serve user-uploaded files (avatars, etc.)
+from pathlib import Path as _Path
+_uploads_dir = _Path(__file__).resolve().parent.parent / "uploads"
+_uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
 
 @app.get("/")
 def root():

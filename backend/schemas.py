@@ -30,8 +30,21 @@ class UserResponse(BaseModel):
     website: Optional[str]
     linkedin: Optional[str]
     onboarding_completed: bool
+    bio: Optional[str] = None
+    location: Optional[str] = None
+    avatar_url: Optional[str] = None
     github_username: Optional[str] = None
     github_avatar_url: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+
+class ProfileUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    mobile: Optional[str] = None
+    user_type: Optional[UserType] = None
+    website: Optional[str] = None
+    linkedin: Optional[str] = None
+    bio: Optional[str] = None
+    location: Optional[str] = None
