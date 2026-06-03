@@ -40,6 +40,8 @@ export const api = {
     `${API}/auth/github/login?mode=connect&token=${encodeURIComponent(token)}`,
   githubMe: (token: string) => getJson("/github/me", token),
   githubRepos: (token: string) => getJson("/github/repos", token),
+  githubRepoIssues: (owner: string, repo: string, token: string) =>
+    getJson(`/github/repos/${owner}/${repo}/issues`, token),
   githubDisconnect: async (token: string) => {
     const res = await fetch(`${API}/github/disconnect`, {
       method: "POST",

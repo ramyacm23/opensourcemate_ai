@@ -284,6 +284,37 @@ def github_repos(current: models.User = Depends(get_current_user)):
     ]
 
 
+@router.get("/github/repos/{owner}/{repo}/issues")
+def github_repo_issues(
+    owner: str,
+    repo: str,
+    current: models.User = Depends(get_current_user),
+):
+    if not current.github_access_token:
+        raise HTTPException(status_code=400, detail="GitHub not connected")
+    issues = _gh_get(
+        f"https://api.github.com/repos/{owner}/{repo}/issues",
+        current.github_access_token,
+        state="open",
+        per_page=30,
+        sort="updated",
+    )
+    # Filter out PRs (GitHub returns them under /issues too)
+    return [
+        {
+            "number": i["number"],
+            "title": i["title"],
+            "html_url": i["html_url"],
+            "state": i["state"],
+            "labels": [{"name": l["name"], "color": l.get("color")} for l in i.get("labels", [])],
+            "comments": i.get("comments", 0),
+            "updated_at": i.get("updated_at"),
+        }
+        for i in issues
+        if "pull_request" not in i
+    ]
+
+
 @router.post("/github/disconnect")
 def github_disconnect(
     current: models.User = Depends(get_current_user),
