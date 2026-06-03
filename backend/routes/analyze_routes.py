@@ -105,7 +105,13 @@ Schema:
   "pr_title": "Short, conventional-commit style title",
   "pr_description": "Markdown PR body: what + why + how + checklist"
 }
-Be concrete. Prefer code examples over hand-waving. Keep beginner-friendly tone."""
+Be concrete. Prefer code examples over hand-waving. Keep beginner-friendly tone.
+
+CRITICAL OUTPUT RULES:
+- Return a SINGLE valid JSON object. No prose before or after.
+- Inside any string value, you MUST escape newlines as \\n, tabs as \\t, and double-quotes as \\".
+- Never put raw line breaks inside a JSON string.
+- Do not wrap the JSON in markdown fences."""
 
 
 async def _call_llm(prompt: str) -> Dict[str, Any]:
@@ -169,18 +175,64 @@ async def _call_llm(prompt: str) -> Dict[str, Any]:
             cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
             cleaned = re.sub(r"\s*```\s*$", "", cleaned)
 
-        try:
-            return json.loads(cleaned)
-        except json.JSONDecodeError:
-            # Last resort: extract first {...} block
-            match = re.search(r"\{.*\}", cleaned, re.DOTALL)
-            if match:
-                try:
-                    return json.loads(match.group(0))
-                except json.JSONDecodeError:
-                    pass
-            log.error("LLM returned non-JSON: %s", content[:500])
-            raise HTTPException(502, "AI returned malformed response")
+        # Try strict parse, then progressively more lenient strategies
+        for candidate in _json_candidates(cleaned):
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                continue
+
+        log.error("LLM returned non-JSON: %s", content[:1000])
+        raise HTTPException(502, "AI returned malformed response")
+
+
+def _json_candidates(s: str):
+    """Yield successively more lenient versions of `s` to attempt json.loads on."""
+    yield s
+
+    # Extract first {...} block (handles preamble/trailing prose)
+    m = re.search(r"\{.*\}", s, re.DOTALL)
+    if m:
+        block = m.group(0)
+        yield block
+        # Escape raw control chars inside JSON string values
+        yield _escape_raw_controls_in_strings(block)
+
+    # Same fix on the original
+    yield _escape_raw_controls_in_strings(s)
+
+
+def _escape_raw_controls_in_strings(s: str) -> str:
+    """Escape raw \n, \r, \t inside JSON string literals so json.loads accepts the doc.
+    Walks the string tracking whether we're inside a double-quoted string."""
+    out = []
+    in_str = False
+    esc = False
+    for ch in s:
+        if esc:
+            out.append(ch)
+            esc = False
+            continue
+        if ch == "\\":
+            out.append(ch)
+            esc = True
+            continue
+        if ch == '"':
+            in_str = not in_str
+            out.append(ch)
+            continue
+        if in_str:
+            if ch == "\n":
+                out.append("\\n")
+            elif ch == "\r":
+                out.append("\\r")
+            elif ch == "\t":
+                out.append("\\t")
+            else:
+                out.append(ch)
+        else:
+            out.append(ch)
+    return "".join(out)
 
 
 def _build_prompt(req: schemas.AnalyzeRequest, issue_data: Optional[dict], repo_data: Optional[dict]) -> str:
