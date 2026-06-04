@@ -190,7 +190,7 @@ export default function AnalysisResultPage({ params }: { params: Promise<{ id: s
 
         {/* Root cause + Files */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {data.root_cause && (
+          {data.root_cause && !["n/a", "na", "none", "not applicable"].includes(data.root_cause.trim().toLowerCase()) && (
             <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
               className="md:col-span-2 bg-surface border border-border rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-3">
