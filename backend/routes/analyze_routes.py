@@ -422,6 +422,50 @@ async def _call_llm(prompt: str) -> Dict[str, Any]:
         raise HTTPException(502, "AI returned malformed response")
 
 
+async def _call_llm_chat(messages: list, max_tokens: int = 1500) -> str:
+    """Plain chat completion (no JSON enforcement) using the same provider config.
+    `messages` is a list of {"role": "system"|"user"|"assistant", "content": str}.
+    Returns the assistant text.
+    """
+    if LLM_PROVIDER == "azure":
+        if not (AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY and AZURE_OPENAI_DEPLOYMENT):
+            raise HTTPException(503, "Azure OpenAI not configured")
+        url = (
+            f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}"
+            f"/chat/completions?api-version={AZURE_OPENAI_API_VERSION}"
+        )
+        auth_headers = {"api-key": AZURE_OPENAI_API_KEY}
+        model_for_payload = AZURE_OPENAI_DEPLOYMENT
+    else:
+        if not LLM_API_KEY:
+            raise HTTPException(503, "AI service not configured")
+        url = f"{LLM_BASE_URL}/chat/completions"
+        auth_headers = {"Authorization": f"Bearer {LLM_API_KEY}"}
+        model_for_payload = LLM_MODEL
+
+    payload = {
+        "model": model_for_payload,
+        "messages": messages,
+        "temperature": 0.5,
+        "max_tokens": max_tokens,
+    }
+    headers = {**auth_headers, "Content-Type": "application/json"}
+
+    async with httpx.AsyncClient(timeout=90.0) as client:
+        r = await client.post(url, headers=headers, json=payload)
+        if r.status_code != 200:
+            log.error("LLM chat error %s: %s", r.status_code, r.text[:500])
+            raise HTTPException(502, f"AI service error ({r.status_code})")
+        body = r.json()
+        try:
+            content = body["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError):
+            content = body.get("result", {}).get("response") or body.get("response") or ""
+        if not content:
+            raise HTTPException(502, "AI returned empty response")
+        return content.strip()
+
+
 def _json_candidates(s: str):
     """Yield successively more lenient versions of `s` to attempt json.loads on."""
     yield s
@@ -857,3 +901,154 @@ def delete_analysis(
     db.delete(row)
     db.commit()
     return {"ok": True}
+
+
+# ---------------- Chat assistant ----------------
+
+CHAT_SYSTEM = """You are OpenSourceMate's friendly contribution coach.
+A student or junior developer is looking at an AI analysis of a GitHub issue / repo / error / merge conflict and has follow-up questions.
+You have FULL CONTEXT of that analysis below. Stay grounded in it — refer to specific files, steps, code suggestions, and commands from the context. Don't invent file paths or facts not present in the context.
+
+Be concise: 2-6 short paragraphs OR a tight bulleted list. Use markdown. Use fenced code blocks with a language tag for any code. If the user asks something unrelated to programming/contribution, gently redirect.
+
+If you genuinely don't know, say so and suggest where they could look. Never produce fake links."""
+
+
+def _build_chat_context(a: models.Analysis) -> str:
+    """Compact, structured context for the chat assistant."""
+    lines = ["# Analysis context"]
+    if a.repo_name:
+        lines.append(f"- Repo: {a.repo_name}")
+    if a.repo_language:
+        lines.append(f"- Primary language: {a.repo_language}")
+    if a.issue_url:
+        lines.append(f"- Issue URL: {a.issue_url}")
+    if a.issue_title:
+        lines.append(f"- Issue title: {a.issue_title}")
+    if a.difficulty:
+        lines.append(f"- Difficulty: {a.difficulty}")
+    if a.tech_stack:
+        lines.append(f"- Tech stack: {a.tech_stack}")
+
+    if a.summary:
+        lines.append("\n## Summary\n" + a.summary)
+    if a.root_cause and a.root_cause.strip().lower() not in ("n/a", "na", ""):
+        lines.append("\n## Root cause\n" + a.root_cause)
+    if a.files_involved:
+        lines.append("\n## Files involved\n" + a.files_involved)
+    if a.solution_steps:
+        # cap to keep prompts manageable
+        steps = a.solution_steps if len(a.solution_steps) <= 5000 else a.solution_steps[:5000] + "\n…[truncated]"
+        lines.append("\n## Step-by-step solution\n" + steps)
+    if a.code_suggestions:
+        try:
+            cs = json.loads(a.code_suggestions)
+            if isinstance(cs, list) and cs:
+                lines.append("\n## Code suggestions")
+                for i, item in enumerate(cs[:5], 1):
+                    if not isinstance(item, dict):
+                        continue
+                    lines.append(f"\n### #{i} — {item.get('file') or '(file unknown)'}"
+                                 + (f" L{item.get('lines')}" if item.get('lines') else ""))
+                    if item.get("explanation"):
+                        lines.append(item["explanation"])
+                    lang = item.get("language") or ""
+                    if item.get("before"):
+                        lines.append(f"Before:\n```{lang}\n{item['before']}\n```")
+                    if item.get("after"):
+                        lines.append(f"After:\n```{lang}\n{item['after']}\n```")
+        except Exception:
+            pass
+    if a.git_commands:
+        lines.append("\n## Git commands\n```bash\n" + a.git_commands + "\n```")
+    if a.error_log:
+        snippet = a.error_log[:1500] + ("\n…[truncated]" if len(a.error_log) > 1500 else "")
+        lines.append("\n## User-provided error log\n```\n" + snippet + "\n```")
+    if a.merge_conflict:
+        snippet = a.merge_conflict[:1500] + ("\n…[truncated]" if len(a.merge_conflict) > 1500 else "")
+        lines.append("\n## User-provided merge conflict\n```\n" + snippet + "\n```")
+
+    return "\n".join(lines)
+
+
+@router.get("/{analysis_id}/chat", response_model=list[schemas.ChatMessage])
+def list_chat_messages(
+    analysis_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    # ownership check
+    a = (
+        db.query(models.Analysis)
+        .filter(models.Analysis.id == analysis_id, models.Analysis.user_id == current_user.id)
+        .first()
+    )
+    if not a:
+        raise HTTPException(404, "Analysis not found")
+    msgs = (
+        db.query(models.AnalysisMessage)
+        .filter(models.AnalysisMessage.analysis_id == analysis_id)
+        .order_by(models.AnalysisMessage.id.asc())
+        .all()
+    )
+    return msgs
+
+
+@router.post("/{analysis_id}/chat", response_model=schemas.ChatResponse)
+async def send_chat_message(
+    analysis_id: int,
+    body: schemas.ChatRequest,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    user_text = (body.message or "").strip()
+    if not user_text:
+        raise HTTPException(400, "Message cannot be empty")
+    if len(user_text) > 4000:
+        raise HTTPException(400, "Message too long (4000 char max)")
+
+    a = (
+        db.query(models.Analysis)
+        .filter(models.Analysis.id == analysis_id, models.Analysis.user_id == current_user.id)
+        .first()
+    )
+    if not a:
+        raise HTTPException(404, "Analysis not found")
+
+    # Persist user msg first
+    user_msg = models.AnalysisMessage(analysis_id=a.id, role="user", content=user_text)
+    db.add(user_msg)
+    db.commit()
+    db.refresh(user_msg)
+
+    # Build prompt: system + analysis context + last 20 messages
+    history = (
+        db.query(models.AnalysisMessage)
+        .filter(models.AnalysisMessage.analysis_id == a.id)
+        .order_by(models.AnalysisMessage.id.asc())
+        .all()
+    )
+    # keep last 20 turns
+    history = history[-20:]
+
+    messages = [
+        {"role": "system", "content": CHAT_SYSTEM + "\n\n" + _build_chat_context(a)},
+    ]
+    for m in history:
+        messages.append({"role": m.role, "content": m.content})
+
+    try:
+        reply = await _call_llm_chat(messages, max_tokens=1500)
+    except HTTPException:
+        # rollback the user message? keep it so the user can retry
+        raise
+    except Exception as e:
+        log.exception("Chat call failed")
+        raise HTTPException(502, f"AI chat failed: {str(e)[:200]}")
+
+    asst = models.AnalysisMessage(analysis_id=a.id, role="assistant", content=reply)
+    db.add(asst)
+    db.commit()
+    db.refresh(asst)
+
+    return schemas.ChatResponse(user_message=user_msg, assistant_message=asst)

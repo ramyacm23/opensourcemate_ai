@@ -76,3 +76,14 @@ class Analysis(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User")
+
+
+class AnalysisMessage(Base):
+    """Chat messages tied to an analysis (user ↔ AI assistant)."""
+    __tablename__ = "analysis_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    analysis_id = Column(Integer, ForeignKey("analyses.id", ondelete="CASCADE"), nullable=False, index=True)
+    role = Column(String, nullable=False)  # "user" | "assistant"
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

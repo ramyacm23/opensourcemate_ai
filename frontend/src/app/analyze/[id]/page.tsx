@@ -10,6 +10,7 @@ import {
 import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Markdown } from "@/components/Markdown";
+import { AssistantPanel } from "@/components/AssistantPanel";
 
 interface Analysis {
   id: number;
@@ -425,6 +426,10 @@ export default function AnalysisResultPage({ params }: { params: Promise<{ id: s
             </div>
           </motion.section>
         )}
+        <AssistantPanel
+          analysisId={data.id}
+          contextLabel={data.repo_name || data.issue_title || undefined}
+        />
     </div>
   );
 }

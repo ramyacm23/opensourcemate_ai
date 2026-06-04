@@ -99,6 +99,12 @@ export const api = {
     if (!res.ok) throw new Error("Delete failed");
     return res.json();
   },
+
+  // Chat assistant scoped to one analysis
+  listChatMessages: (analysisId: number, token: string) =>
+    getJson(`/analyze/${analysisId}/chat`, token),
+  sendChatMessage: (analysisId: number, message: string, token: string) =>
+    req(`/analyze/${analysisId}/chat`, { message }, token),
 };
 
 // Helper to resolve avatar URLs returned by the API.
