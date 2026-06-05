@@ -57,7 +57,8 @@ AZURE_OPENAI_EMBED_API_VERSION = os.getenv(
 EMBED_DIM = 1536  # text-embedding-3-small
 _EXTENSION_OK = False  # flips True after init_extension succeeds
 
-_EMBED_TABLE_DDL = f"""
+_EMBED_DDL_STATEMENTS = [
+    f"""
 CREATE TABLE IF NOT EXISTS analysis_embeddings (
     id           BIGSERIAL PRIMARY KEY,
     analysis_id  INTEGER NOT NULL REFERENCES analyses(id) ON DELETE CASCADE,
@@ -70,19 +71,17 @@ CREATE TABLE IF NOT EXISTS analysis_embeddings (
     pr_merged    BOOLEAN DEFAULT FALSE,
     embedding    vector({EMBED_DIM}) NOT NULL,
     created_at   TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX IF NOT EXISTS analysis_embeddings_user_idx
-    ON analysis_embeddings (user_id);
-CREATE INDEX IF NOT EXISTS analysis_embeddings_analysis_idx
-    ON analysis_embeddings (analysis_id);
--- ivfflat needs a non-empty table to train; fall back to creating it lazily.
-"""
+)
+""",
+    "CREATE INDEX IF NOT EXISTS analysis_embeddings_user_idx ON analysis_embeddings (user_id)",
+    "CREATE INDEX IF NOT EXISTS analysis_embeddings_analysis_idx ON analysis_embeddings (analysis_id)",
+]
 
 _IVFFLAT_DDL = """
 CREATE INDEX IF NOT EXISTS analysis_embeddings_embed_idx
     ON analysis_embeddings
     USING ivfflat (embedding vector_cosine_ops)
-    WITH (lists = 100);
+    WITH (lists = 100)
 """
 
 
@@ -104,10 +103,8 @@ def init_extension(engine) -> bool:
     try:
         with engine.begin() as conn:
             conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-            for stmt in _EMBED_TABLE_DDL.split(";"):
-                s = stmt.strip()
-                if s:
-                    conn.execute(text(s))
+            for stmt in _EMBED_DDL_STATEMENTS:
+                conn.execute(text(stmt))
         _EXTENSION_OK = True
         log.info("RAG: pgvector extension + analysis_embeddings ready")
         return True
