@@ -164,7 +164,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="p-2 border-t border-border space-y-1">
             {/* GitHub external */}
             <a
-              href="https://github.com/Zyora-Dev/opensourcemate"
+              href="https://github.com/ramyacm23/OpenSourceMate"
               target="_blank"
               rel="noreferrer"
               className={cn(
