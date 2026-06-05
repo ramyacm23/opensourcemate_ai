@@ -27,6 +27,22 @@ with engine.begin() as conn:
     conn.execute(text("ALTER TABLE contribution_runs ADD COLUMN IF NOT EXISTS pr_state TEXT"))
     conn.execute(text("ALTER TABLE contribution_runs ADD COLUMN IF NOT EXISTS pr_merged_at TIMESTAMPTZ"))
     conn.execute(text("ALTER TABLE contribution_runs ADD COLUMN IF NOT EXISTS pr_checked_at TIMESTAMPTZ"))
+    # Email verification + OTP table
+    conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE"))
+    conn.execute(text(
+        "CREATE TABLE IF NOT EXISTS email_otps ("
+        "id SERIAL PRIMARY KEY, "
+        "email TEXT NOT NULL, "
+        "purpose TEXT NOT NULL, "
+        "otp_hash TEXT NOT NULL, "
+        "payload TEXT, "
+        "attempts INTEGER NOT NULL DEFAULT 0, "
+        "expires_at TIMESTAMPTZ NOT NULL, "
+        "created_at TIMESTAMPTZ DEFAULT NOW()"
+        ")"
+    ))
+    conn.execute(text("CREATE INDEX IF NOT EXISTS ix_email_otps_email ON email_otps (email)"))
+    conn.execute(text("CREATE INDEX IF NOT EXISTS ix_email_otps_email_purpose ON email_otps (email, purpose)"))
 
 # RAG (Stage 8 — Phase B). Soft-fails if pgvector isn't installed at the DB level.
 import rag as _rag  # noqa: E402

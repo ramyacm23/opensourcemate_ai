@@ -111,7 +111,12 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm text-muted-foreground">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-sm text-muted-foreground">Password</Label>
+                <Link href="/forgot-password" className="text-xs text-crimson hover:underline font-medium">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
                 <Input

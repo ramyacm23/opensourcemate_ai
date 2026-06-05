@@ -11,6 +11,26 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+class RegisterStartRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+class RegisterVerifyRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+class ForgotPasswordStartRequest(BaseModel):
+    email: EmailStr
+
+class ForgotPasswordVerifyRequest(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str
+
+class OkResponse(BaseModel):
+    ok: bool = True
+    message: Optional[str] = None
+
 class OnboardingRequest(BaseModel):
     name: str
     mobile: str

@@ -30,6 +30,19 @@ export const api = {
     req("/auth/register", { email, password }),
   login: (email: string, password: string) =>
     req("/auth/login", { email, password }),
+
+  // Email OTP — registration
+  registerStart: (email: string, password: string) =>
+    req("/auth/register/start", { email, password }),
+  registerVerify: (email: string, otp: string) =>
+    req("/auth/register/verify", { email, otp }),
+
+  // Email OTP — forgot password
+  forgotPasswordRequest: (email: string) =>
+    req("/auth/forgot-password/request", { email }),
+  forgotPasswordVerify: (email: string, otp: string, new_password: string) =>
+    req("/auth/forgot-password/verify", { email, otp, new_password }),
+
   onboard: (body: object, token: string) =>
     req("/onboarding/", body, token),
   dashboard: (token: string) => getJson("/dashboard/", token),
