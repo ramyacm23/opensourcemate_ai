@@ -214,7 +214,7 @@ export default function AboutPage() {
 
       <main className="flex-1 relative z-10">
         {/* HERO */}
-        <section className="px-6 pt-16 pb-10 md:pt-20 md:pb-14 max-w-6xl mx-auto">
+        <section className="px-6 pt-20 pb-20 md:pt-28 md:pb-28 max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -240,7 +240,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.15 }}
-            className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3"
+            className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-3"
           >
             {STATS.map((s) => (
               <div
@@ -264,7 +264,7 @@ export default function AboutPage() {
         </section>
 
         {/* MISSION QUOTE */}
-        <section className="px-6 pb-14 max-w-5xl mx-auto">
+        <section className="px-6 py-20 md:py-28 max-w-5xl mx-auto">
           <motion.figure
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -288,7 +288,7 @@ export default function AboutPage() {
         </section>
 
         {/* STORY */}
-        <section className="px-6 pb-14 max-w-5xl mx-auto">
+        <section className="px-6 py-20 md:py-28 max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -334,8 +334,8 @@ export default function AboutPage() {
         </section>
 
         {/* TIMELINE */}
-        <section className="px-6 pb-16 max-w-5xl mx-auto">
-          <div className="text-center mb-10">
+        <section className="px-6 py-20 md:py-28 max-w-5xl mx-auto">
+          <div className="text-center mb-14">
             <div className="text-[11px] uppercase tracking-[0.2em] text-crimson font-mono mb-2">
               The journey
             </div>
@@ -379,8 +379,8 @@ export default function AboutPage() {
         </section>
 
         {/* VALUES */}
-        <section className="px-6 pb-14 max-w-6xl mx-auto">
-          <div className="text-center mb-9">
+        <section className="px-6 py-20 md:py-28 max-w-6xl mx-auto">
+          <div className="text-center mb-14">
             <div className="text-[11px] uppercase tracking-[0.2em] text-crimson font-mono mb-2">
               What we believe
             </div>
@@ -413,8 +413,8 @@ export default function AboutPage() {
         </section>
 
         {/* TEAM */}
-        <section className="px-6 pb-16 max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+        <section className="px-6 py-20 md:py-28 max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-14">
             <div>
               <div className="text-[11px] uppercase tracking-[0.2em] text-crimson font-mono mb-2">
                 The team
@@ -445,7 +445,7 @@ export default function AboutPage() {
         </section>
 
         {/* CTA */}
-        <section className="px-6 pb-20 max-w-4xl mx-auto">
+        <section className="px-6 pt-12 pb-28 md:pt-16 md:pb-32 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
