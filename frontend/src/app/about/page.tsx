@@ -17,6 +17,9 @@ type Member = {
    *  and set `photo: "/team/<file>.jpg"`. If omitted, a gradient + initials
    *  fallback is rendered automatically. */
   photo?: string;
+  /** Optional CSS object-position for the photo (e.g. "center top", "50% 20%").
+   *  Defaults to "center top" so faces in upper third stay visible. */
+  focal?: string;
   bio?: string;        // 1-line — shows on hover overlay
   tags?: string[];     // chips at the bottom
   linkedin?: string;
@@ -136,6 +139,7 @@ function TeamCard({ m, idx }: { m: Member; idx: number }) {
             alt={m.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            style={{ objectPosition: m.focal ?? "center top" }}
             className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
