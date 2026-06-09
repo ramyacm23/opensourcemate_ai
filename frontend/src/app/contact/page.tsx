@@ -11,13 +11,12 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 const HQ_LINES = [
-  "3/93-26, Venkateshwara Nagar",
-  "Kottaram, Kanniyakumari",
-  "Tamil Nadu, 629703",
+  "VIT University",
+  "Chennai, Tamil Nadu",
   "India",
 ];
 const HQ_QUERY = encodeURIComponent(
-  "3/93-26, Venkateshwara Nagar, Kottaram, Kanniyakumari, Tamil Nadu, 629703",
+  "VIT University, Chennai, Tamil Nadu, India",
 );
 const HQ_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${HQ_QUERY}`;
 
@@ -279,7 +278,7 @@ export default function ContactPage() {
                       Headquarters
                     </div>
                     <div className="text-white font-medium tracking-tight">
-                      Kanniyakumari, India
+                      Chennai, India
                     </div>
                     <address className="not-italic text-xs text-muted-foreground mt-1.5 leading-relaxed">
                       {HQ_LINES.map((l) => (

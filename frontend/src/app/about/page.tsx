@@ -31,7 +31,7 @@ const TEAM: Member[] = [
     name: "Ramya CM",
     role: "Founder",
     initials: "RC",
-    photo: "/team/ramya.png",
+    photo: "/team/ramya.jpeg",
     bio: "Building the platform she wished existed in college.",
     tags: ["Founder", "Product", "Open source"],
     linkedin: "https://www.linkedin.com/in/ramyacm231207",
