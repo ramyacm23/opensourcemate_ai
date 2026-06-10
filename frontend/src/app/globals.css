@@ -3,39 +3,93 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-  --color-background: #0c0a09;
-  --color-surface: #161311;
-  --color-border: #26201d;
-  /* Claude orange palette (kept under "crimson" token names so all existing classes remap automatically) */
-  --color-crimson: #D97757;
-  --color-crimson-dark: #B8593B;
-  --color-crimson-light: #EA9978;
-  --color-crimson-muted: rgba(217, 119, 87, 0.13);
-
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-crimson: var(--crimson);
+  --color-crimson-dark: var(--crimson-dark);
+  --color-crimson-light: var(--crimson-light);
+  --color-crimson-muted: var(--crimson-muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-
   --radius-lg: 0.75rem;
   --radius-md: calc(0.75rem - 2px);
   --radius-sm: calc(0.75rem - 4px);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-foreground: var(--foreground);
+}
 
-  --color-card: #161311;
-  --color-card-foreground: #faf9f7;
-  --color-popover: #161311;
-  --color-popover-foreground: #faf9f7;
-  --color-primary: #D97757;
-  --color-primary-foreground: #faf9f7;
-  --color-secondary: #1d1916;
-  --color-secondary-foreground: #faf9f7;
-  --color-muted: #211c19;
-  --color-muted-foreground: #a39990;
-  --color-accent: #D97757;
-  --color-accent-foreground: #faf9f7;
-  --color-destructive: #ef4444;
-  --color-input: #1d1916;
-  --color-ring: #D97757;
-  --color-foreground: #faf9f7;
+:root {
+  color-scheme: light;
+  --background: #f4efe7;
+  --surface: #fffaf2;
+  --border: #ddd2c4;
+  --crimson: #bf6648;
+  --crimson-dark: #9f4f34;
+  --crimson-light: #d98a6c;
+  --crimson-muted: rgba(191, 102, 72, 0.12);
+  --card: #fffaf2;
+  --card-foreground: #1f1a15;
+  --popover: #fffaf2;
+  --popover-foreground: #1f1a15;
+  --primary: #bf6648;
+  --primary-foreground: #fffaf5;
+  --secondary: #efe6d9;
+  --secondary-foreground: #1f1a15;
+  --muted: #ece3d7;
+  --muted-foreground: #685e53;
+  --accent: #bf6648;
+  --accent-foreground: #fffaf5;
+  --destructive: #dc2626;
+  --input: #fdf8f1;
+  --ring: #bf6648;
+  --foreground: #1f1a15;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #0c0a09;
+  --surface: #161311;
+  --border: #26201d;
+  --crimson: #d97757;
+  --crimson-dark: #b8593b;
+  --crimson-light: #ea9978;
+  --crimson-muted: rgba(217, 119, 87, 0.13);
+  --card: #161311;
+  --card-foreground: #faf9f7;
+  --popover: #161311;
+  --popover-foreground: #faf9f7;
+  --primary: #d97757;
+  --primary-foreground: #faf9f7;
+  --secondary: #1d1916;
+  --secondary-foreground: #faf9f7;
+  --muted: #211c19;
+  --muted-foreground: #a39990;
+  --accent: #d97757;
+  --accent-foreground: #faf9f7;
+  --destructive: #ef4444;
+  --input: #1d1916;
+  --ring: #d97757;
+  --foreground: #faf9f7;
+}
+
+html {
+  background-color: var(--background);
 }
 
 * {
@@ -47,6 +101,56 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.light :is(div, p, span, h1, h2, h3, h4, li, td, th, pre, code, strong, em, label)[class~="text-white"],
+.light :is(div, p, span, h1, h2, h3, h4, li, td, th, pre, code, strong, em, label)[class~="text-white/90"],
+.light :is(div, p, span, h1, h2, h3, h4, li, td, th, pre, code, strong, em, label)[class~="text-white/85"],
+.light :is(div, p, span, h1, h2, h3, h4, li, td, th, pre, code, strong, em, label)[class~="text-white/80"],
+.light :is(div, p, span, h1, h2, h3, h4, li, td, th, pre, code, strong, em, label)[class~="text-white/75"] {
+  color: var(--color-foreground) !important;
+}
+
+.light :is(div, p, span, li, td, th, pre, code, strong, em, label)[class~="text-white/70"],
+.light :is(div, p, span, li, td, th, pre, code, strong, em, label)[class~="text-white/60"],
+.light :is(div, p, span, li, td, th, pre, code, strong, em, label)[class~="text-white/55"],
+.light :is(div, p, span, li, td, th, pre, code, strong, em, label)[class~="text-white/50"],
+.light :is(div, p, span, li, td, th, pre, code, strong, em, label)[class~="text-white/45"],
+.light :is(div, p, span, li, td, th, pre, code, strong, em, label)[class~="text-white/40"],
+.light :is(div, p, span, li, td, th, pre, code, strong, em, label)[class~="text-white/30"],
+.light :is(div, p, span, li, td, th, pre, code, strong, em, label)[class~="text-white/25"] {
+  color: var(--color-muted-foreground) !important;
+}
+
+.light :is(a, button)[class~="text-white"]:not([class~="bg-crimson"]):not([class~="bg-crimson-dark"]):not([class~="bg-white"]),
+.light :is(a, button)[class~="text-white/85"]:not([class~="bg-crimson"]):not([class~="bg-crimson-dark"]):not([class~="bg-white"]),
+.light :is(a, button)[class~="text-white/75"]:not([class~="bg-crimson"]):not([class~="bg-crimson-dark"]):not([class~="bg-white"]) {
+  color: var(--color-foreground) !important;
+}
+
+.light :is(a, button)[class~="hover:text-white"]:hover {
+  color: var(--color-foreground) !important;
+}
+
+.light :is(a, button)[class~="bg-crimson"][class~="text-white"],
+.light :is(a, button)[class~="bg-crimson-dark"][class~="text-white"] {
+  color: var(--color-primary-foreground) !important;
+}
+
+.light :is(a, button)[class~="bg-white"] {
+  background-color: var(--color-card) !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.light :is(a, button)[class~="bg-white"]:hover,
+.light :is(a, button)[class~="hover:bg-slate-100"]:hover {
+  background-color: var(--color-muted) !important;
+}
+
+.light :is(input, textarea)[class~="placeholder:text-white/40"]::placeholder {
+  color: var(--color-muted-foreground) !important;
 }
 
 .glow-crimson {
